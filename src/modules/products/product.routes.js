@@ -6,6 +6,7 @@ import productController from "./product.controller.js";
 const router = Router();
 
 router.post("/", ValidationMiddleware(createProductSchema), productController.createProduct);
+router.get("/", productController.getProducts);
 
 
 export default router

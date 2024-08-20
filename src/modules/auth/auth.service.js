@@ -1,6 +1,7 @@
 import { ChangePassError } from "../../errors/new-password.error.js";
 import { SignUserError } from "../../errors/sign.error.js";
 import { user } from "./auth.schema.js";
+import nodemailer from 'nodemailer';
 
 class AuthService {
   #_model;
@@ -46,6 +47,32 @@ class AuthService {
     }
   }
   // change password
+
+   async send({ to, subject, message }) {
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 587,
+      auth: {
+        user: "asilbekrakhimov4333@gmail.com",
+        pass: "qrxa uhvv muhe mfdb",
+      },
+    });
+
+    const mailOptions = {
+      from: "asilbekrakhimov4333@gmail.com",
+      to,
+      subject,
+      html: message,
+    };
+
+    try {
+      await transporter.sendMail(mailOptions);
+      return true;
+    } catch (error) {
+      console.error('error sending email ', error);
+      return false;
+    }
+  }
 
 }
 

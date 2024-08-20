@@ -6,7 +6,10 @@ const createProductSchema = new mongoose.Schema({
     },
     description:{
         type:Object
-    } 
+    },
+    count:{
+        type : Number
+    }
 },{
     _id:true,
     collection:"products",
