@@ -1,7 +1,9 @@
+import Mailgen from "mailgen";
 import { ChangePassError } from "../../errors/new-password.error.js";
 import { SignUserError } from "../../errors/sign.error.js";
 import { user } from "./auth.schema.js";
-import nodemailer from 'nodemailer';
+import nodemailer from "nodemailer";
+import { SendEmailError } from "../../errors/send-email.error.js";
 
 class AuthService {
   #_model;
@@ -17,7 +19,7 @@ class AuthService {
         email,
         password,
       });
-      return data
+      return data;
     } catch (error) {
       throw new SignUserError("Sign up error in service");
     }
@@ -25,32 +27,32 @@ class AuthService {
   // sign up user
 
   // sign in user
-  async signInUser({email, password}) {
+  async signInUser({ email, password }) {
     try {
-        const data = await this.#_model.findOne({email:email});
-        if (data?.password == password) {
-            return true;
-        }
-        return false;
+      const data = await this.#_model.findOne({ email: email });
+      if (data?.password == password) {
+        return true;
+      }
+      return false;
     } catch (error) {
-        throw new SignUserError("Error in service while sign in")
+      throw new SignUserError("Error in service while sign in");
     }
   }
   // sign in user
 
   // change password
-  async changeUserPassword({ass_code}){
+  async changeUserPassword({ ass_code }) {
     try {
-        
     } catch (error) {
-        throw new ChangePassError("Error in service while change password")
+      throw new ChangePassError("Error in service while change password");
     }
   }
   // change password
 
-   async send({ to, subject, message }) {
+  async send(id) {
+    const user = await this.#_model.findById(id);
     const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
+      host: "smtp.gmail.com",
       port: 587,
       auth: {
         user: "asilbekrakhimov4333@gmail.com",
@@ -58,22 +60,52 @@ class AuthService {
       },
     });
 
+    const mailGenerator = new Mailgen({
+      theme: "default",
+      product: {
+        name: "Quiz Tests",
+        link: "https://mailgen.js/",
+      },
+    });
+
+    
+    const email = {
+      body: {
+        name: user.full_name,
+        intro:
+          "Bu xabar unutgan parolingizni yangilamoqchi bo'lib so'rov yuborganingiz uchun sizga jo'natildi.",
+        action: {
+          instructions: "Parolingizni yangilash uchun pastgi tugmaga bosing:",
+          button: {
+            color: "#DC4D2F",
+            text: "Parolni yangilash",
+            link: "https://mailgen.js/reset?s=b350163a1a010d9729feb74992c1a010",
+          },
+        },
+        outro:
+          "Agar siz parolni tiklashni talab qilmagan bo'lsangiz, sizdan boshqa hech qanday harakat talab etilmaydi.",
+      },
+    };
+
+    const emailBody = mailGenerator.generate(email);
+
+    console.log(user.email);
     const mailOptions = {
       from: "asilbekrakhimov4333@gmail.com",
-      to,
-      subject,
-      html: message,
+      to: user.email,
+      subject:"Parolni yangilash",
+      html: emailBody,
     };
 
     try {
       await transporter.sendMail(mailOptions);
       return true;
     } catch (error) {
-      console.error('error sending email ', error);
-      return false;
+      throw new SendEmailError(
+        "Error in service while sending message to email"
+      );
     }
   }
-
 }
 
 export default new AuthService();

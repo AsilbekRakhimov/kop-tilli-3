@@ -8,6 +8,7 @@ const router = Router();
 
 router.post("/sign-up", ValidationMiddleware(signUpUserSchema), authController.signUp);
 router.post("/sign-in", ValidationMiddleware(signInUserSchema), authController.signin);
-router.post("/send-msg-email", authController.sendMessage);
+router.post("/send-msg-email/:id", authController.sendMessage);
+router.post("/change-password")
 
 export default router;

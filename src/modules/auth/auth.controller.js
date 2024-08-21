@@ -47,16 +47,22 @@ class AuthController {
 
   sendMessage = async (req, res) => {
     try {
-      const data = await this.#_service.send({
-        to: "asilbekrakhimov5@gmail.com",
-        subject: "aaaaa",
-        message: `<h1 style="text-align:center">Hello Dear asilbek<h1/>`
-      });
-      res.status(200).send({
-        message: "Message send",
+      const id = req.params.id;
+      const data = await this.#_service.send(id);
+      if (data) {
+        res.status(200).send({
+          message: "Message is send",
+        });
+        return;
+      }
+      res.status(400).send({
+        message: "Message is not send",
       });
     } catch (error) {
-      console.log(error);
+      res.status(409).send({
+        name: error.name,
+        message: error.message + " in controller sending email",
+      });
     }
   };
 }
