@@ -41,14 +41,19 @@ class AuthService {
   // sign in user
 
   // change password
-  async changeUserPassword({ ass_code }) {
+  async changeUserPassword({ newPassword, id }) {
     try {
+        const data = await this.#_model.findByIdAndUpdate(id, {
+            password:newPassword
+        })
+        return data
     } catch (error) {
       throw new ChangePassError("Error in service while change password");
     }
   }
   // change password
 
+  // send msg to email
   async send(id) {
     const user = await this.#_model.findById(id);
     const transporter = nodemailer.createTransport({
@@ -106,6 +111,8 @@ class AuthService {
       );
     }
   }
+  // send msg to email
+
 }
 
 export default new AuthService();

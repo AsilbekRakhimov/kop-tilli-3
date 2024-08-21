@@ -65,6 +65,27 @@ class AuthController {
       });
     }
   };
+
+  changePassword = async (req, res) => {
+    try {
+        const id = req.params.id
+        const data = await this.#_service.changeUserPassword({...req.body, id});
+        if (data) {
+            res.status(200).send({
+                message:"Password is updated"
+            });
+            return ;
+        }
+        res.status(404).send({
+            message:"User is not found"
+        });
+    } catch (error) {
+        res.status(400).send({
+            name:error.name, 
+            message:error.message + ' in controller change password'
+        })
+    }
+  }
 }
 
 export default new AuthController();
